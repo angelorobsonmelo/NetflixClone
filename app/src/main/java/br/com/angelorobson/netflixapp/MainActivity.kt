@@ -86,9 +86,10 @@ class MainActivity : AppCompatActivity(), CategoryTask.CategoryLoader {
         override fun onBindViewHolder(holder: MoviewHolder, position: Int) {
             val movie = movies[position]
             val imageDownloderTask = ImageDownloderTask(WeakReference(holder.imageView))
-            val bitmap = Application.getBitmapFromMemCache(movie.id.toString())
-            if (bitmap != null) {
-                holder.imageView.setImageBitmap(bitmap)
+            val bitmapCache = Application.getBitmapFromMemCache(movie.coverUrl)
+
+            if (bitmapCache != null && movie.coverUrl == bitmapCache.url) {
+                holder.imageView.setImageBitmap(bitmapCache.bitmap)
                 return
             }
 

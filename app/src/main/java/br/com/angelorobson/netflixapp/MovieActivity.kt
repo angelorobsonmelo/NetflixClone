@@ -90,9 +90,10 @@ class MovieActivity : AppCompatActivity(), MovieDetailTask.MovieDetailLoader {
         fun bind(item: Movie) {
             with(itemView) {
                 val imageDownloderTask = ImageDownloderTask(WeakReference(image_view))
-                val bitmap = Application.getBitmapFromMemCache(item.id.toString())
-                if (bitmap != null) {
-                    image_view.setImageBitmap(bitmap)
+                val bitmapCache = Application.getBitmapFromMemCache(item.coverUrl)
+
+                if (bitmapCache != null && item.coverUrl == bitmapCache.url) {
+                    image_view.setImageBitmap(bitmapCache.bitmap)
                     return
                 }
 
@@ -113,9 +114,9 @@ class MovieActivity : AppCompatActivity(), MovieDetailTask.MovieDetailLoader {
             val il = ImageDownloderTask(WeakReference(imageCover))
             il.setShadowEnable(true)
 
-            val bitmap = Application.getBitmapFromMemCache(this.movie.id.toString())
-            if (bitmap != null) {
-                imageCover.setImageBitmap(bitmap)
+            val bitmapCache = Application.getBitmapFromMemCache(this.movie.coverUrl)
+            if (bitmapCache != null && this.movie.coverUrl == bitmapCache.url) {
+                imageCover.setImageBitmap(bitmapCache.bitmap)
                 return
             }
 

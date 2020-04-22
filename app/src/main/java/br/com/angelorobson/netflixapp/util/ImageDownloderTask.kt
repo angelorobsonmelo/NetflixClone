@@ -10,6 +10,7 @@ import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import br.com.angelorobson.netflixapp.Application
 import br.com.angelorobson.netflixapp.R
+import br.com.angelorobson.netflixapp.model.BitmapCache
 import br.com.angelorobson.netflixapp.model.Movie
 import java.lang.ref.WeakReference
 import java.net.HttpURLConnection
@@ -20,6 +21,7 @@ class ImageDownloderTask(private val weakReference: WeakReference<ImageView>) :
 
     private var shadowEnabled = false
     private var idImageMovie = 0
+    private var urlCover = ""
 
     fun setShadowEnable(shadowEnabled: Boolean) {
         this.shadowEnabled = shadowEnabled
@@ -31,6 +33,7 @@ class ImageDownloderTask(private val weakReference: WeakReference<ImageView>) :
         var urlConnection: HttpURLConnection? = null
         try {
             val url = URL(movie.coverUrl)
+            urlCover = movie.coverUrl
             idImageMovie = movie.id
 
             urlConnection = url.openConnection() as HttpURLConnection
@@ -99,7 +102,10 @@ class ImageDownloderTask(private val weakReference: WeakReference<ImageView>) :
 
             imageView.setImageBitmap(bitmap)
 
-            Application.addBitmapToMemoryCache(idImageMovie.toString(), bitmap)
+            Application.addBitmapToMemoryCache(
+                urlCover,
+                BitmapCache(urlCover, bitmap!!)
+            )
         }
     }
 }
