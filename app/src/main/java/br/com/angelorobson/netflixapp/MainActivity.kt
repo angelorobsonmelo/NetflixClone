@@ -1,12 +1,12 @@
 package br.com.angelorobson.netflixapp
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import br.com.angelorobson.netflixapp.model.Category
@@ -14,10 +14,11 @@ import br.com.angelorobson.netflixapp.model.Movie
 import br.com.angelorobson.netflixapp.util.CategoryTask
 import br.com.angelorobson.netflixapp.util.ImageDownloderTask
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.movie_item.*
 import java.lang.ref.WeakReference
+import java.nio.channels.AsynchronousFileChannel.open
 
 class MainActivity : AppCompatActivity(), CategoryTask.CategoryLoader {
+
 
     private val mainAdapter = MainAdapter(mutableListOf())
 
@@ -85,7 +86,14 @@ class MainActivity : AppCompatActivity(), CategoryTask.CategoryLoader {
 
         override fun onBindViewHolder(holder: MoviewHolder, position: Int) {
             val movie = movies[position]
-            ImageDownloderTask(WeakReference(holder.imageView)).execute(movie.coverUrl)
+            val il = ImageDownloderTask(WeakReference(holder.imageView))
+            val bitmap = Application.getBitmapFromMemCache(movie.id.toString())
+            if (bitmap != null) {
+                holder.imageView.setImageBitmap(bitmap)
+                return
+            }
+
+            il.execute(movie)
         }
 
         override fun onclick(position: Int) {

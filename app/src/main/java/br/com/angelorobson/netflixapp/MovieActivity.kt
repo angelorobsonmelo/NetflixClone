@@ -1,7 +1,5 @@
 package br.com.angelorobson.netflixapp
 
-import android.content.Intent
-import android.graphics.drawable.LayerDrawable
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
@@ -9,7 +7,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import br.com.angelorobson.netflixapp.model.Movie
@@ -17,8 +14,6 @@ import br.com.angelorobson.netflixapp.model.MovieDetail
 import br.com.angelorobson.netflixapp.util.ImageDownloderTask
 import br.com.angelorobson.netflixapp.util.MovieDetailTask
 import kotlinx.android.synthetic.main.activity_movie.*
-import kotlinx.android.synthetic.main.movie_item_similar.*
-import kotlinx.android.synthetic.main.movie_item_similar.image_view
 import kotlinx.android.synthetic.main.movie_item_similar.view.*
 import java.lang.ref.WeakReference
 
@@ -94,7 +89,14 @@ class MovieActivity : AppCompatActivity(), MovieDetailTask.MovieDetailLoader {
 
         fun bind(item: Movie) {
             with(itemView) {
-                ImageDownloderTask(WeakReference(image_view)).execute(item.coverUrl)
+                val imageDownloderTask = ImageDownloderTask(WeakReference(image_view))
+                val bitmap = Application.getBitmapFromMemCache(item.id.toString())
+                if (bitmap != null) {
+                    image_view.setImageBitmap(bitmap)
+                    return
+                }
+
+                imageDownloderTask.execute(item)
             }
         }
     }
@@ -108,11 +110,17 @@ class MovieActivity : AppCompatActivity(), MovieDetailTask.MovieDetailLoader {
             movieAdapter.setMovies(this.moviesSimilar)
             movieAdapter.notifyDataSetChanged()
 
-            val imageViewDownloader = ImageDownloderTask(WeakReference(imageCover))
-            imageViewDownloader.setShadowEnable(true)
-            imageViewDownloader.execute(this.movie.coverUrl)
-        }
+            val il = ImageDownloderTask(WeakReference(imageCover))
+            il.setShadowEnable(true)
 
+            val bitmap = Application.getBitmapFromMemCache(this.movie.id.toString())
+            if (bitmap != null) {
+                imageCover.setImageBitmap(bitmap)
+                return
+            }
+
+            il.execute(this.movie)
+        }
 
     }
 

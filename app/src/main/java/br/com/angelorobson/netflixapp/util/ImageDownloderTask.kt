@@ -8,28 +8,30 @@ import android.graphics.drawable.LayerDrawable
 import android.os.AsyncTask
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
+import br.com.angelorobson.netflixapp.Application
 import br.com.angelorobson.netflixapp.R
-import java.lang.Exception
+import br.com.angelorobson.netflixapp.model.Movie
 import java.lang.ref.WeakReference
 import java.net.HttpURLConnection
 import java.net.URL
 
 class ImageDownloderTask(private val weakReference: WeakReference<ImageView>) :
-    AsyncTask<String, Void, Bitmap>() {
-
+    AsyncTask<Movie, Void, Bitmap>() {
 
     private var shadowEnabled = false
+    private var idImageMovie = 0
 
     fun setShadowEnable(shadowEnabled: Boolean) {
         this.shadowEnabled = shadowEnabled
     }
 
-    override fun doInBackground(vararg params: String?): Bitmap {
-        val urlImg = params[0]
+    override fun doInBackground(vararg params: Movie?): Bitmap {
+        val movie = params[0] as Movie
 
         var urlConnection: HttpURLConnection? = null
         try {
-            val url = URL(urlImg)
+            val url = URL(movie.coverUrl)
+            idImageMovie = movie.id
 
             urlConnection = url.openConnection() as HttpURLConnection
 
@@ -95,9 +97,9 @@ class ImageDownloderTask(private val weakReference: WeakReference<ImageView>) :
                 }
             }
 
-
-
             imageView.setImageBitmap(bitmap)
+
+            Application.addBitmapToMemoryCache(idImageMovie.toString(), bitmap)
         }
     }
 }
