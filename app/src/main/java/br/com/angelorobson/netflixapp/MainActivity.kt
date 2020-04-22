@@ -15,7 +15,6 @@ import br.com.angelorobson.netflixapp.util.CategoryTask
 import br.com.angelorobson.netflixapp.util.ImageDownloderTask
 import kotlinx.android.synthetic.main.activity_main.*
 import java.lang.ref.WeakReference
-import java.nio.channels.AsynchronousFileChannel.open
 
 class MainActivity : AppCompatActivity(), CategoryTask.CategoryLoader {
 
@@ -86,14 +85,14 @@ class MainActivity : AppCompatActivity(), CategoryTask.CategoryLoader {
 
         override fun onBindViewHolder(holder: MoviewHolder, position: Int) {
             val movie = movies[position]
-            val il = ImageDownloderTask(WeakReference(holder.imageView))
+            val imageDownloderTask = ImageDownloderTask(WeakReference(holder.imageView))
             val bitmap = Application.getBitmapFromMemCache(movie.id.toString())
             if (bitmap != null) {
                 holder.imageView.setImageBitmap(bitmap)
                 return
             }
 
-            il.execute(movie)
+            imageDownloderTask.execute(movie)
         }
 
         override fun onclick(position: Int) {
